@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ZEC Atlas — Zcash Ecosystem Directory &amp; ZEC Price Terminal</title>
+<meta name="description" content="Search every Zcash wallet, swap, app, and org in one directory. Live ZEC price, shielded-pool stats, and ecosystem news — priced in ZEC.">
+<meta name="theme-color" content="#0a0a0c">
+<link rel="canonical" href="https://zecatlas.com/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="ZEC Atlas">
+<meta property="og:title" content="ZEC Atlas — Zcash Ecosystem Directory &amp; ZEC Price Terminal">
+<meta property="og:description" content="Every Zcash wallet, swap, app and org in one searchable directory. Live prices priced in ZEC, shielded-pool stats, ecosystem news.">
+<meta property="og:url" content="https://zecatlas.com/">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="ZEC Atlas — Zcash Ecosystem Directory &amp; ZEC Price Terminal">
+<meta name="twitter:description" content="Every Zcash wallet, swap, app and org in one searchable directory. Priced in ZEC.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M16 2 28 7v9c0 8-6 13-12 15C10 29 4 24 4 16V7Z' fill='%23f4b728'/%3E%3Ctext x='16' y='22' font-family='system-ui' font-size='16' font-weight='700' text-anchor='middle' fill='%230a0a0c'%3EZ%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="styles.css">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "ZEC Atlas",
+  "alternateName": "Zcash Atlas",
+  "url": "https://zecatlas.com/",
+  "description": "Zcash (ZEC) ecosystem directory and price terminal: wallets, swaps, exchanges, infrastructure, organizations, grants and more — with live prices priced in ZEC and shielded-pool stats.",
+  "about": { "@type": "Thing", "name": "Zcash", "sameAs": "https://z.cash/" },
+  "inLanguage": "en"
+}
+</script>
+</head>
+<body data-tab="terminal">
+<a class="skip-link" href="#main">Skip to content</a>
+
+<header class="site-header">
+  <div class="wrap">
+    <div class="header-row">
+      <a class="brand" href="#terminal" aria-label="ZEC Atlas home">
+        <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
+          <path d="M16 2 28 7v9c0 8-6 13-12 15C10 29 4 24 4 16V7Z" fill="#f4b728"/>
+          <text x="16" y="22" font-family="system-ui, sans-serif" font-size="16" font-weight="700" text-anchor="middle" fill="#0a0a0c">Z</text>
+        </svg>
+        <span class="brand-name">ZEC <b>Atlas</b></span>
+        <span class="brand-tag">priced in ZEC</span>
+      </a>
+      <div id="ticker" aria-live="polite">Loading ZEC price…</div>
+    </div>
+    <nav class="tabs" aria-label="Sections">
+      <button class="tab active" data-tab="terminal" type="button">Terminal</button>
+      <button class="tab" data-tab="shielded" type="button">Shielded</button>
+      <button class="tab" data-tab="feed" type="button">Feed</button>
+      <button class="tab" data-tab="directory" type="button">Directory</button>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+
+  <section id="view-terminal" class="view active">
+    <div class="wrap">
+      <h1 class="view-title">The Zcash ecosystem, priced in ZEC</h1>
+      <p class="view-sub">Live ZEC market data and every major asset quoted in ZEC. Refresh every 60 seconds.</p>
+      <div class="terminal-grid">
+        <div class="panel">
+          <div id="terminal-hero"></div>
+          <div id="zec-spark"></div>
+        </div>
+        <div class="panel">
+          <div class="converter">
+            <h2>Convert</h2>
+            <div class="conv-row">
+              <div class="conv-field">
+                <label for="conv-usd">US dollars</label>
+                <input id="conv-usd" type="text" inputmode="decimal" value="100" autocomplete="off">
+              </div>
+              <div class="conv-field">
+                <label for="conv-zec">ZEC</label>
+                <input id="conv-zec" type="text" inputmode="decimal" autocomplete="off">
+              </div>
+            </div>
+            <p class="panel-note">Rate updates with the live ZEC price. 1 ZEC = <span id="conv-note">—</span>.</p>
+          </div>
+          <div class="priced">
+            <h2>Priced in ZEC</h2>
+            <p class="priced-sub">What one unit of each asset costs in ZEC, and what one ZEC buys.</p>
+            <div id="priced-rows"></div>
+            <p class="panel-note">Prices: CoinGecko, with Coinbase spot as fallback. Not financial advice.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="view-shielded" class="view">
+    <div class="wrap">
+      <h1 class="view-title">Shielded pool stats</h1>
+      <p class="view-sub">How much ZEC is shielded across pools vs transparent, live where possible and dated snapshots otherwise.</p>
+      <p class="source-line muted" id="shield-asof"></p>
+      <div class="shield-grid">
+        <div class="panel" id="donut"></div>
+        <div class="panel">
+          <div class="shield-tiles" id="shield-tiles"></div>
+          <p class="panel-note">
+            Live pool data: <a href="https://cipherscan.app" target="_blank" rel="noopener">CipherScan</a>.
+            Historical snapshots: <a href="https://zechub.wiki/dashboard" target="_blank" rel="noopener">ZecHub dashboard data</a>.
+            "Shielded share" counts Sprout, Sapling, Orchard and Ironwood supply.
+          </p>
+        </div>
+      </div>
+      <div class="panel" id="shield-trend" style="margin-top: 18px;"></div>
+    </div>
+  </section>
+
+  <section id="view-feed" class="view">
+    <div class="wrap">
+      <h1 class="view-title">Ecosystem feed</h1>
+      <p class="view-sub">Zcash mentions and updates from Hacker News, Mastodon and the Zcash Foundation, newest first. Links open in a new tab.</p>
+      <div class="feed-list" id="feed-list"></div>
+    </div>
+  </section>
+
+  <section id="view-directory" class="view">
+    <div class="wrap">
+      <h1 class="view-title">The Zcash directory</h1>
+      <p class="view-sub">Wallets, swaps, exchanges, infrastructure, developers, organizations, grants and community — one searchable index.</p>
+      <div class="dir-controls">
+        <input id="dir-search" type="search" placeholder="Search projects, tags, categories…" autocomplete="off" aria-label="Search directory">
+        <span id="dir-count"></span>
+      </div>
+      <div class="dir-chips" id="dir-chips"></div>
+      <div class="dir-list" id="dir-list"></div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <p><strong>ZEC Atlas</strong> is an independent community project. Not affiliated with the Zcash Foundation, ZODL, QEDIT or any listed project. Not financial advice.</p>
+    <p>Data: <a href="https://www.coingecko.com/en/coins/zcash" target="_blank" rel="noopener">CoinGecko</a> · <a href="https://cipherscan.app" target="_blank" rel="noopener">CipherScan</a> · <a href="https://zechub.wiki" target="_blank" rel="noopener">ZecHub</a> · <a href="https://hn.algolia.com" target="_blank" rel="noopener">Hacker News</a> · <a href="https://mastodon.social" target="_blank" rel="noopener">Mastodon</a> · <a href="https://zfnd.org" target="_blank" rel="noopener">Zcash Foundation</a>.</p>
+    <p>Every listing links to its official site. Spotted a dead link or missing project? Open an issue on GitHub.</p>
+    <p>&copy; <span id="year"></span> ZEC Atlas — <span class="muted">priced in ZEC.</span></p>
+  </div>
+</footer>
+
+<noscript><div class="wrap"><p class="empty">ZEC Atlas needs JavaScript for live prices and the searchable directory.</p></div></noscript>
+<script src="data/directory.js"></script>
+<script src="app.js" defer></script>
+</body>
+</html>

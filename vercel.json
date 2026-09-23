@@ -1,0 +1,18 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/cipherscan/:path*",
+      "destination": "https://api.mainnet.cipherscan.app/api/:path*"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/data/(.*)",
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=300" }]
+    },
+    {
+      "source": "/api/cipherscan/(.*)",
+      "headers": [{ "key": "Cache-Control", "value": "public, s-maxage=120, stale-while-revalidate=300" }]
+    }
+  ]
+}

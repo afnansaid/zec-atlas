@@ -1,0 +1,11 @@
+{
+  "name": "zec-atlas",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Zcash (ZEC) ecosystem directory and price terminal — priced in ZEC.",
+  "type": "module",
+  "scripts": {
+    "dev": "node dev-server.mjs",
+    "start": "node dev-server.mjs"
+  }
+}
