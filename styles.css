@@ -71,15 +71,18 @@ button { font-family: inherit; }
 .tab {
   appearance: none; background: none; border: 1px solid transparent; color: var(--muted);
   padding: 7px 14px; border-radius: 999px; cursor: pointer; font-size: 13.5px; font-weight: 550;
-  white-space: nowrap; transition: color .15s ease, background .15s ease;
+  white-space: nowrap; text-decoration: none; display: inline-flex; align-items: center;
+  transition: color .15s ease, background .15s ease;
 }
 .tab:hover { color: var(--text); }
 .tab.active { color: var(--gold); background: var(--gold-soft); border-color: rgba(244, 183, 40, 0.25); }
 
-/* Views */
-.view { display: none; padding: 28px 0 60px; }
-.view.active { display: block; }
-.view-title { font-size: 26px; margin: 0 0 6px; letter-spacing: -0.01em; }
+/* Sections */
+.section { padding: 34px 0 26px; scroll-margin-top: 108px; }
+.view-title { font-size: 28px; margin: 0 0 6px; letter-spacing: -0.01em; }
+.section-title { font-size: 24px; margin: 0 0 4px; letter-spacing: -0.01em; }
+.section-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; margin-bottom: 18px; }
+.section-head .view-sub { margin-bottom: 0; }
 .view-sub { color: var(--muted); margin: 0 0 24px; font-size: 14px; }
 .muted { color: var(--muted); }
 .up { color: var(--up); }
@@ -150,7 +153,14 @@ button { font-family: inherit; }
 .tile-v { display: block; font-family: var(--mono); font-size: 15px; margin-top: 3px; }
 #shield-trend { margin-top: 18px; border-top: 1px solid var(--line); padding-top: 16px; }
 #shield-trend h3 { font-size: 14px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 0 0 10px; }
-.source-line { font-size: 12px; margin: 10px 0 0; }
+.source-line { font-size: 12px; margin: 0; padding-top: 8px; white-space: nowrap; }
+.list-actions { display: flex; justify-content: center; padding: 18px 0 4px; }
+.show-more {
+  background: var(--panel); color: var(--gold); border: 1px solid rgba(244, 183, 40, 0.3);
+  border-radius: 999px; padding: 10px 20px; font-size: 13px; cursor: pointer;
+  transition: background .15s ease, border-color .15s ease;
+}
+.show-more:hover { background: var(--gold-soft); border-color: rgba(244, 183, 40, 0.5); }
 
 /* Feed */
 .feed-list { display: grid; gap: 10px; }
@@ -202,7 +212,13 @@ button { font-family: inherit; }
 .site-footer a { border-bottom: 1px dashed var(--line); }
 .site-footer a:hover { border-color: rgba(244, 183, 40, 0.5); }
 
+@media (min-width: 1080px) {
+  .dir-list { grid-template-columns: repeat(3, 1fr); }
+}
+
 @media (max-width: 900px) {
+  .section-head { flex-direction: column; gap: 2px; }
+  .source-line { white-space: normal; }
   .terminal-grid, .shield-grid { grid-template-columns: 1fr; }
   .dir-list { grid-template-columns: 1fr; }
   .hero-price { font-size: 32px; }

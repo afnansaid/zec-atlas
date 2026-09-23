@@ -48,7 +48,10 @@
     shieldedSource: null,
     shieldedAsOf: null,
     directoryCat: "all",
-    directoryQuery: ""
+    directoryQuery: "",
+    directoryShowAll: false,
+    feedAll: null,
+    feedLimit: 12
   };
 
   function $(sel, root) { return (root || document).querySelector(sel); }
@@ -161,28 +164,30 @@
     return [];
   }
 
-  // ---------- Router ----------
+  // ---------- Nav ----------
 
-  function setTab(tab) {
-    var tabs = ["terminal", "shielded", "feed", "directory"];
-    if (tabs.indexOf(tab) === -1) tab = "terminal";
-    $$(".tab").forEach(function (b) { b.classList.toggle("active", b.dataset.tab === tab); });
-    $$(".view").forEach(function (v) { v.classList.toggle("active", v.id === "view-" + tab); });
-    document.body.dataset.tab = tab;
-    if (window.history.replaceState) window.history.replaceState(null, "", "#" + tab);
-    else location.hash = "#" + tab;
-  }
-
-  function initRouter() {
-    $$(".tab").forEach(function (btn) {
-      btn.addEventListener("click", function () { setTab(btn.dataset.tab); });
+  function initNav() {
+    var links = $$(".tab");
+    var sections = links.map(function (l) { return document.getElementById(l.dataset.target); }).filter(Boolean);
+    function setActive(id) {
+      links.forEach(function (l) { l.classList.toggle("active", l.dataset.target === id); });
+    }
+    function onScroll() {
+      var pos = window.scrollY + 140;
+      var current = sections[0];
+      sections.forEach(function (s) {
+        if (s.offsetTop <= pos) current = s;
+      });
+      if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 80) {
+        current = sections[sections.length - 1];
+      }
+      if (current) setActive(current.id);
+    }
+    links.forEach(function (l) {
+      l.addEventListener("click", function () { setActive(l.dataset.target); });
     });
-    var initial = (location.hash || "").replace("#", "").split("?")[0];
-    setTab(initial || "terminal");
-    window.addEventListener("hashchange", function () {
-      var t = (location.hash || "").replace("#", "");
-      if (t && document.body.dataset.tab !== t) setTab(t);
-    });
+    window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
   }
 
   // ---------- Terminal ----------
@@ -601,7 +606,7 @@
 
   function loadFeed() {
     var cached = cacheGet("feed", 600000);
-    if (cached) { renderFeed(cached); return Promise.resolve(); }
+    if (cached) { state.feedAll = cached; renderFeed(); return Promise.resolve(); }
 
     var hn = fetchJson("https://hn.algolia.com/api/v1/search_by_date?query=zcash&tags=story&hitsPerPage=20")
       .then(function (r) {
@@ -648,18 +653,23 @@
       items.sort(function (a, b) { return new Date(b.date) - new Date(a.date); });
       var top = items.slice(0, 40);
       if (top.length) cacheSet("feed", top);
-      renderFeed(top);
+      state.feedAll = top;
+      renderFeed();
     });
   }
 
-  function renderFeed(items) {
+  function renderFeed() {
+    var items = state.feedAll || [];
     var box = $("#feed-list");
+    var actions = $("#feed-actions");
     box.innerHTML = "";
+    actions.innerHTML = "";
     if (!items.length) {
       box.appendChild(el("p", "empty", "Feed unavailable right now. Try again shortly."));
       return;
     }
-    items.forEach(function (item) {
+    var visible = items.slice(0, state.feedLimit);
+    visible.forEach(function (item) {
       var a = el("a", "feed-item");
       a.href = item.url;
       a.target = "_blank";
@@ -672,6 +682,18 @@
       if (item.meta) a.appendChild(el("p", "feed-meta muted", item.meta));
       box.appendChild(a);
     });
+
+    if (items.length > visible.length) {
+      actions.appendChild(showMore("Show more", function () {
+        state.feedLimit += 24;
+        renderFeed();
+      }));
+    } else if (state.feedLimit > 12) {
+      actions.appendChild(showMore("Show fewer", function () {
+        state.feedLimit = 12;
+        renderFeed();
+      }));
+    }
   }
 
   // ---------- Directory ----------
@@ -693,6 +715,7 @@
       b.appendChild(el("span", "chip-count", String(counts[key] || 0)));
       b.addEventListener("click", function () {
         state.directoryCat = key;
+        state.directoryShowAll = false;
         renderDirectory();
       });
       return b;
@@ -713,7 +736,9 @@
     });
 
     var list = $("#dir-list");
+    var actions = $("#dir-actions");
     list.innerHTML = "";
+    actions.innerHTML = "";
     var count = $("#dir-count");
     count.textContent = results.length + " of " + DIRECTORY.length + " projects";
 
@@ -722,7 +747,9 @@
       return;
     }
 
-    results.forEach(function (e) {
+    var visible = state.directoryShowAll ? results : results.slice(0, 30);
+
+    visible.forEach(function (e) {
       var meta = CATEGORY_META[e.category] || { label: e.category, color: "#71717a" };
       var card = el("article", "card");
       var head = el("div", "card-head");
@@ -756,6 +783,25 @@
       card.appendChild(links);
       list.appendChild(card);
     });
+
+    if (results.length > visible.length) {
+      actions.appendChild(showMore("Show all " + results.length + " projects", function () {
+        state.directoryShowAll = true;
+        renderDirectory();
+      }));
+    } else if (state.directoryShowAll && results.length > 30) {
+      actions.appendChild(showMore("Show fewer", function () {
+        state.directoryShowAll = false;
+        renderDirectory();
+      }));
+    }
+  }
+
+  function showMore(label, onClick) {
+    var b = el("button", "show-more", label);
+    b.type = "button";
+    b.addEventListener("click", onClick);
+    return b;
   }
 
   function extLink(href, label) {
@@ -767,9 +813,12 @@
   }
 
   function initDirectory() {
+    var total = $("#dir-total");
+    if (total) total.textContent = DIRECTORY.length + " projects · verified links";
     var input = $("#dir-search");
     input.addEventListener("input", function () {
       state.directoryQuery = input.value || "";
+      state.directoryShowAll = false;
       renderDirectory();
     });
     renderDirectory();
@@ -782,7 +831,7 @@
   }
 
   document.addEventListener("DOMContentLoaded", function () {
-    initRouter();
+    initNav();
     initDirectory();
     bootFooter();
     loadPrices();

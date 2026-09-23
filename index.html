@@ -30,7 +30,7 @@
 }
 </script>
 </head>
-<body data-tab="terminal">
+<body>
 <a class="skip-link" href="#main">Skip to content</a>
 
 <header class="site-header">
@@ -47,20 +47,20 @@
       <div id="ticker" aria-live="polite">Loading ZEC price…</div>
     </div>
     <nav class="tabs" aria-label="Sections">
-      <button class="tab active" data-tab="terminal" type="button">Terminal</button>
-      <button class="tab" data-tab="shielded" type="button">Shielded</button>
-      <button class="tab" data-tab="feed" type="button">Feed</button>
-      <button class="tab" data-tab="directory" type="button">Directory</button>
+      <a class="tab active" href="#terminal" data-target="terminal">Terminal</a>
+      <a class="tab" href="#shielded" data-target="shielded">Shielded</a>
+      <a class="tab" href="#directory" data-target="directory">Directory</a>
+      <a class="tab" href="#feed" data-target="feed">Feed</a>
     </nav>
   </div>
 </header>
 
 <main id="main">
 
-  <section id="view-terminal" class="view active">
+  <section id="terminal" class="section">
     <div class="wrap">
-      <h1 class="view-title">The Zcash ecosystem, priced in ZEC</h1>
-      <p class="view-sub">Live ZEC market data and every major asset quoted in ZEC. Refresh every 60 seconds.</p>
+      <h1 class="view-title">The Zcash ecosystem, mapped.</h1>
+      <p class="view-sub">Live prices priced in ZEC, shielded-pool stats, every project in the ecosystem, and the news feed — all on one page.</p>
       <div class="terminal-grid">
         <div class="panel">
           <div id="terminal-hero"></div>
@@ -92,11 +92,15 @@
     </div>
   </section>
 
-  <section id="view-shielded" class="view">
+  <section id="shielded" class="section">
     <div class="wrap">
-      <h1 class="view-title">Shielded pool stats</h1>
-      <p class="view-sub">How much ZEC is shielded across pools vs transparent, live where possible and dated snapshots otherwise.</p>
-      <p class="source-line muted" id="shield-asof"></p>
+      <div class="section-head">
+        <div>
+          <h2 class="section-title">Shielded pool stats</h2>
+          <p class="view-sub">How much ZEC is shielded across pools vs transparent — live where possible, dated snapshots otherwise.</p>
+        </div>
+        <span class="source-line muted" id="shield-asof"></span>
+      </div>
       <div class="shield-grid">
         <div class="panel" id="donut"></div>
         <div class="panel">
@@ -112,24 +116,35 @@
     </div>
   </section>
 
-  <section id="view-feed" class="view">
+  <section id="directory" class="section">
     <div class="wrap">
-      <h1 class="view-title">Ecosystem feed</h1>
-      <p class="view-sub">Zcash mentions and updates from Hacker News, Mastodon and the Zcash Foundation, newest first. Links open in a new tab.</p>
-      <div class="feed-list" id="feed-list"></div>
-    </div>
-  </section>
-
-  <section id="view-directory" class="view">
-    <div class="wrap">
-      <h1 class="view-title">The Zcash directory</h1>
-      <p class="view-sub">Wallets, swaps, exchanges, infrastructure, developers, organizations, grants and community — one searchable index.</p>
+      <div class="section-head">
+        <div>
+          <h2 class="section-title">The Zcash directory</h2>
+          <p class="view-sub">Wallets, swaps, exchanges, infrastructure, developers, organizations, grants and community — one searchable index.</p>
+        </div>
+        <span class="source-line muted" id="dir-total"></span>
+      </div>
       <div class="dir-controls">
         <input id="dir-search" type="search" placeholder="Search projects, tags, categories…" autocomplete="off" aria-label="Search directory">
         <span id="dir-count"></span>
       </div>
       <div class="dir-chips" id="dir-chips"></div>
       <div class="dir-list" id="dir-list"></div>
+      <div class="list-actions" id="dir-actions"></div>
+    </div>
+  </section>
+
+  <section id="feed" class="section">
+    <div class="wrap">
+      <div class="section-head">
+        <div>
+          <h2 class="section-title">Ecosystem feed</h2>
+          <p class="view-sub">Zcash mentions and updates from Hacker News, Mastodon and the Zcash Foundation, newest first.</p>
+        </div>
+      </div>
+      <div class="feed-list" id="feed-list"></div>
+      <div class="list-actions" id="feed-actions"></div>
     </div>
   </section>
 
