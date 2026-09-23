@@ -26,7 +26,7 @@
   "name": "ZEC Atlas",
   "alternateName": "Zcash Atlas",
   "url": "https://zecatlas.com/",
-  "description": "Zcash (ZEC) ecosystem directory and price terminal: wallets, swaps, exchanges, infrastructure, organizations, grants and more — with live prices priced in ZEC and shielded-pool stats.",
+  "description": "Zcash (ZEC) ecosystem directory and price terminal: shielded-pool stats, wallets, swaps, exchanges, infrastructure, organizations, grants and more — with live prices priced in ZEC.",
   "about": { "@type": "Thing", "name": "Zcash", "sameAs": "https://z.cash/" },
   "inLanguage": "en"
 }
@@ -38,7 +38,7 @@
 <header class="site-header">
   <div class="wrap">
     <div class="header-row">
-      <a class="brand" href="#terminal" aria-label="ZEC Atlas home">
+      <a class="brand" href="#shielded" aria-label="ZEC Atlas home">
         <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
           <path d="M16 2 28 7v9c0 8-6 13-12 15C10 29 4 24 4 16V7Z" fill="#f4b728"/>
           <text x="16" y="22" font-family="system-ui, sans-serif" font-size="16" font-weight="700" text-anchor="middle" fill="#0a0a0c">Z</text>
@@ -49,8 +49,8 @@
       <div id="ticker" aria-live="polite">Loading ZEC price…</div>
     </div>
     <nav class="tabs" aria-label="Sections">
-      <a class="tab active" href="#terminal" data-target="terminal">Terminal</a>
-      <a class="tab" href="#shielded" data-target="shielded">Shielded</a>
+      <a class="tab active" href="#shielded" data-target="shielded">Shielded</a>
+      <a class="tab" href="#terminal" data-target="terminal">Terminal</a>
       <a class="tab" href="#directory" data-target="directory">Directory</a>
       <a class="tab" href="#feed" data-target="feed">Feed</a>
     </nav>
@@ -59,10 +59,67 @@
 
 <main id="main">
 
+  <section id="shielded" class="section">
+    <div class="wrap">
+      <div class="section-head">
+        <div>
+          <h1 class="view-title">Shielded first.</h1>
+          <p class="view-sub">Where the ZEC actually is: live shielded-pool supply, flows and activity — the number this chain exists for.</p>
+        </div>
+        <span class="source-line muted" id="shield-asof"></span>
+      </div>
+
+      <div class="matters">
+        <article class="matter">
+          <span class="matter-tag live">NU6.3 · live</span>
+          <h3>Ironwood is the new pool</h3>
+          <p>Activated 28 Jul 2026 at block 3,428,143. Orchard supply is migrating through the turnstile into Ironwood — now the largest shielded pool.</p>
+          <a href="https://zips.z.cash/zip-0258" target="_blank" rel="noopener">ZIP 258</a>
+        </article>
+        <article class="matter">
+          <span class="matter-tag">NU7 · in review</span>
+          <h3>NU7 candidates under poll</h3>
+          <p>25-second blocks (ZIP 218), v6 transactions, memo bundles, fee burning (NSM) and the Sprout wind-down are in the candidate set. No activation height set.</p>
+          <a href="https://zips.z.cash/" target="_blank" rel="noopener">Open ZIPs</a>
+        </article>
+        <article class="matter">
+          <span class="matter-tag warn">Warning</span>
+          <h3>Move legacy Sprout funds</h3>
+          <p>NU7 would leave Sprout funds unspendable. Legacy holders should sweep to a modern shielded address now. Sprout holds only a few thousand ZEC.</p>
+          <a href="https://forum.zcashcommunity.com/" target="_blank" rel="noopener">Forum</a>
+        </article>
+      </div>
+
+      <div class="kpi-row" id="shield-kpis"></div>
+
+      <div class="shield-grid">
+        <div class="panel" id="donut"></div>
+        <div class="panel">
+          <h3 class="subhead">Pool flows</h3>
+          <div id="pool-flows"></div>
+          <p class="panel-note" id="flows-note">Positive = ZEC entering the pool, negative = leaving. Ironwood shows no baseline yet (activated Jul 2026).</p>
+        </div>
+      </div>
+
+      <div class="shield-tiles" id="shield-tiles"></div>
+
+      <div class="chart-grid">
+        <div class="panel" id="shield-trend"></div>
+        <div class="panel" id="shield-tx"></div>
+      </div>
+
+      <p class="panel-note">
+        Live pool data: <a href="https://cipherscan.app" target="_blank" rel="noopener">CipherScan</a>.
+        Historical snapshots: <a href="https://zechub.wiki/dashboard" target="_blank" rel="noopener">ZecHub dashboard data</a>.
+        "Shielded share" counts Sprout, Sapling, Orchard and Ironwood supply.
+      </p>
+    </div>
+  </section>
+
   <section id="terminal" class="section">
     <div class="wrap">
-      <h1 class="view-title">The Zcash ecosystem, mapped.</h1>
-      <p class="view-sub">Live prices priced in ZEC, shielded-pool stats, every project in the ecosystem, and the news feed — all on one page.</p>
+      <h2 class="section-title">Priced in ZEC</h2>
+      <p class="view-sub">Live ZEC market data and every major asset quoted in ZEC. Refreshes every 60 seconds.</p>
       <div class="terminal-grid">
         <div class="panel">
           <div id="terminal-hero"></div>
@@ -84,37 +141,13 @@
             <p class="panel-note">Rate updates with the live ZEC price. 1 ZEC = <span id="conv-note">—</span>.</p>
           </div>
           <div class="priced">
-            <h2>Priced in ZEC</h2>
+            <h2>Asset prices</h2>
             <p class="priced-sub">What one unit of each asset costs in ZEC, and what one ZEC buys.</p>
             <div id="priced-rows"></div>
             <p class="panel-note">Prices: CoinGecko, with Coinbase spot as fallback. Not financial advice.</p>
           </div>
         </div>
       </div>
-    </div>
-  </section>
-
-  <section id="shielded" class="section">
-    <div class="wrap">
-      <div class="section-head">
-        <div>
-          <h2 class="section-title">Shielded pool stats</h2>
-          <p class="view-sub">How much ZEC is shielded across pools vs transparent — live where possible, dated snapshots otherwise.</p>
-        </div>
-        <span class="source-line muted" id="shield-asof"></span>
-      </div>
-      <div class="shield-grid">
-        <div class="panel" id="donut"></div>
-        <div class="panel">
-          <div class="shield-tiles" id="shield-tiles"></div>
-          <p class="panel-note">
-            Live pool data: <a href="https://cipherscan.app" target="_blank" rel="noopener">CipherScan</a>.
-            Historical snapshots: <a href="https://zechub.wiki/dashboard" target="_blank" rel="noopener">ZecHub dashboard data</a>.
-            "Shielded share" counts Sprout, Sapling, Orchard and Ironwood supply.
-          </p>
-        </div>
-      </div>
-      <div class="panel" id="shield-trend" style="margin-top: 18px;"></div>
     </div>
   </section>
 

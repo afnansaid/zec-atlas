@@ -165,12 +165,47 @@ button { font-family: inherit; }
 .swatch { width: 11px; height: 11px; border-radius: 3px; display: inline-block; }
 .legend-val { font-family: var(--mono); font-size: 12.5px; }
 .legend-pct { font-size: 12px; }
-.shield-tiles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 18px; }
+.shield-tiles { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-top: 18px; }
 .tile { background: var(--panel-2); border: 1px solid var(--line); border-radius: 10px; padding: 12px; }
 .tile-k { display: block; color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: .05em; }
 .tile-v { display: block; font-family: var(--mono); font-size: 15px; margin-top: 3px; }
-#shield-trend { margin-top: 18px; border-top: 1px solid var(--line); padding-top: 16px; }
+#shield-trend { margin-top: 0; border-top: none; padding-top: 0; }
 #shield-trend h3 { font-size: 14px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 0 0 10px; }
+
+/* What matters now */
+.matters { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 18px; }
+.matter { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px 16px; display: flex; flex-direction: column; gap: 6px; }
+.matter-tag { align-self: flex-start; font-size: 10.5px; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); border: 1px solid var(--line); border-radius: 999px; padding: 3px 9px; }
+.matter-tag.live { color: var(--gold); border-color: rgba(244, 183, 40, 0.4); background: var(--gold-soft); }
+.matter-tag.warn { color: #fca5a5; border-color: rgba(248, 113, 113, 0.4); background: rgba(248, 113, 113, 0.08); }
+.matter h3 { margin: 2px 0 0; font-size: 15px; }
+.matter p { margin: 0; font-size: 13px; color: #c9c9d1; }
+.matter a { font-size: 12.5px; color: var(--gold); }
+
+/* KPI row */
+.kpi-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 18px; }
+.kpi { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px 16px; display: flex; flex-direction: column; gap: 4px; }
+.kpi-k { font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+.kpi-v { font-family: var(--mono); font-size: 22px; font-weight: 650; }
+.kpi-sub { font-size: 12px; color: var(--muted); }
+.kpi-delta.up { color: var(--up); }
+.kpi-delta.down { color: var(--down); }
+
+/* Pool flows */
+.subhead { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 0 0 12px; }
+.flows { overflow-x: auto; }
+.flow-row { display: grid; grid-template-columns: 1.3fr 1fr 0.7fr 0.7fr 0.7fr; gap: 8px; align-items: center; padding: 7px 0; font-family: var(--mono); font-size: 12.5px; border-bottom: 1px solid var(--line); min-width: 380px; }
+.flow-row:last-child { border-bottom: none; }
+.flow-head { color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: .05em; padding-bottom: 4px; }
+.flow-head span:not(:first-child) { text-align: right; }
+.flow-name { display: flex; align-items: center; gap: 8px; font-family: var(--sans); }
+.flow-supply, .flow-delta { text-align: right; }
+.flow-delta.up { color: var(--up); }
+.flow-delta.down { color: var(--down); }
+
+/* Charts */
+.chart-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-top: 18px; }
+.chart-grid h3 { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 0 0 12px; }
 .source-line { font-size: 12px; margin: 0; padding-top: 8px; white-space: nowrap; }
 .list-actions { display: flex; justify-content: center; padding: 18px 0 4px; }
 .show-more {
@@ -242,6 +277,9 @@ button { font-family: inherit; }
   .hero-price { font-size: 32px; }
   .hero-facts { grid-template-columns: repeat(2, 1fr); }
   .shield-tiles { grid-template-columns: repeat(2, 1fr); }
+  .matters { grid-template-columns: 1fr; }
+  .kpi-row { grid-template-columns: repeat(2, 1fr); }
+  .chart-grid { grid-template-columns: 1fr; }
   #ticker { display: none; }
 }
 

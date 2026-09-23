@@ -45,6 +45,9 @@
     pricesAt: null,
     chart: null,
     chain: null,
+    poolOverview: null,
+    shieldTx: null,
+    shieldTxTotal: null,
     shieldedSource: null,
     shieldedAsOf: null,
     directoryCat: "all",
@@ -400,11 +403,18 @@
     var donutBox = $("#donut");
     var tiles = $("#shield-tiles");
     var trend = $("#shield-trend");
+    var kpis = $("#shield-kpis");
+    var flows = $("#pool-flows");
+    var tx = $("#shield-tx");
     donutBox.innerHTML = "";
     tiles.innerHTML = "";
     trend.innerHTML = "";
+    kpis.innerHTML = "";
+    flows.innerHTML = "";
+    tx.innerHTML = "";
 
     var chain = state.chain;
+    var deltas = state.poolOverview && state.poolOverview.deltas ? state.poolOverview.deltas : null;
     if (!chain) {
       var msg = el("p", "empty");
       if (state.shieldHistory && state.shieldHistory.length) {
@@ -422,19 +432,14 @@
 
       if (state.shieldHistory && state.shieldHistory.length) {
         var latestShield = state.shieldHistory[state.shieldHistory.length - 1];
-        var snap = [["Shielded (snapshot)", fmtNum(latestShield, 0) + " ZEC"]];
+        kpi(kpis, "Shielded", fmtNum(latestShield, 0) + " ZEC", "ZecHub snapshot", null);
         if (state.shieldTotal) {
-          snap.push(["Total supply (snapshot)", fmtNum(state.shieldTotal, 0) + " ZEC"]);
-          snap.push(["Shielded share", fmtNum((latestShield / state.shieldTotal) * 100, 1) + "%"]);
+          kpi(kpis, "Shielded share", fmtNum((latestShield / state.shieldTotal) * 100, 1) + "%", "of " + fmtNum(state.shieldTotal, 0) + " ZEC supply", null);
         }
-        snap.push(["Source", "ZecHub snapshots"]);
-        snap.forEach(function (pair) {
-          var t = el("div", "tile");
-          t.appendChild(el("span", "tile-k", pair[0]));
-          t.appendChild(el("span", "tile-v", pair[1]));
-          tiles.appendChild(t);
-        });
       }
+      flows.appendChild(el("p", "muted", "Pool flows need the live connection — deploy on Vercel."));
+      tx.appendChild(el("h3", null, "Shielded transactions per day"));
+      tx.appendChild(el("p", "muted", "Needs the live connection — deploy on Vercel."));
     } else {
       var pools = chain.pools;
       var shieldedPools = pools.filter(function (p) { return p.name !== "transparent" && p.name !== "lockbox"; });
@@ -442,6 +447,12 @@
       var transparent = (pools.find(function (p) { return p.name === "transparent"; }) || {}).value || 0;
       var total = shielded + transparent || 1;
       var lockbox = (pools.find(function (p) { return p.name === "lockbox"; }) || {}).value || 0;
+      var ironwood = (pools.find(function (p) { return p.name === "ironwood"; }) || {}).value || 0;
+
+      kpi(kpis, "Shielded", fmtNum(shielded, 0) + " ZEC", "across all shielded pools", deltaPct(deltas && deltas.shielded ? deltas.shielded["30d"] : null, shielded));
+      kpi(kpis, "Shielded share", fmtNum((shielded / total) * 100, 1) + "%", "of " + fmtNum(total / 1e6, 2) + "M ZEC supply", null);
+      kpi(kpis, "Ironwood", fmtNum(ironwood, 0) + " ZEC", "newest pool · NU6.3", null);
+      kpi(kpis, "Transparent", fmtNum(transparent, 0) + " ZEC", "public by default", deltaPct(deltas && deltas.transparent ? deltas.transparent["30d"] : null, transparent));
 
       var shares = shieldedPools.map(function (p) {
         return { name: p.name, value: p.value, pct: (p.value / total) * 100 };
@@ -471,13 +482,43 @@
       legend.appendChild(trC);
       donutBox.appendChild(legend);
 
+      if (deltas) {
+        var flowNames = ["sprout", "sapling", "orchard", "ironwood", "shielded", "transparent"];
+        var table = el("div", "flows");
+        var head = el("div", "flow-row flow-head");
+        [["Pool", ""], ["Supply", ""], ["24h", ""], ["7d", ""], ["30d", ""]].forEach(function (h) {
+          head.appendChild(el("span", null, h[0]));
+        });
+        table.appendChild(head);
+        flowNames.forEach(function (name) {
+          if (!deltas[name]) return;
+          var pool = pools.find(function (p) { return p.name === name; });
+          var supply = name === "shielded" ? shielded : name === "lockbox" ? lockbox : pool ? pool.value : null;
+          var row = el("div", "flow-row");
+          var nameCell = el("span", "flow-name");
+          var sw2 = el("span", "swatch");
+          sw2.style.background = name === "shielded" ? "#f4b728" : poolColor(name);
+          nameCell.appendChild(sw2);
+          nameCell.appendChild(el("span", null, cap(name)));
+          row.appendChild(nameCell);
+          row.appendChild(el("span", "flow-supply", supply != null ? fmtNum(supply, 0) : "—"));
+          ["24h", "7d", "30d"].forEach(function (w) {
+            var d = deltas[name] ? deltas[name][w] : null;
+            row.appendChild(el("span", "flow-delta " + (d == null ? "muted" : d >= 0 ? "up" : "down"), d == null ? "—" : signedZec(d)));
+          });
+          table.appendChild(row);
+        });
+        flows.appendChild(table);
+      } else {
+        flows.appendChild(el("p", "muted", "Flow data unavailable right now."));
+      }
+
       [
         ["Total supply", fmtNum(total, 0) + " ZEC"],
-        ["Shielded", fmtNum(shielded, 0) + " ZEC"],
-        ["Shielded share", fmtNum((shielded / total) * 100, 1) + "%"],
         ["Lockbox", fmtNum(lockbox, 0) + " ZEC"],
-        ["Block height", state.chain.height ? fmtNum(state.chain.height, 0) : "—"],
-        ["Difficulty", state.chain.difficulty ? fmtCompact(state.chain.difficulty) : "—"]
+        ["Block height", chain.height ? fmtNum(chain.height, 0) : "—"],
+        ["Difficulty", chain.difficulty ? fmtCompact(chain.difficulty) : "—"],
+        ["Updated", state.shieldedAsOf ? state.shieldedAsOf : "—"]
       ].forEach(function (pair) {
         var t = el("div", "tile");
         t.appendChild(el("span", "tile-k", pair[0]));
@@ -499,6 +540,42 @@
       var growth = ((latest - oldest) / oldest) * 100;
       trend.appendChild(el("p", "muted", fmtNum(latest, 0) + " ZEC shielded · " + pct(growth) + " over the shown window · source: ZecHub snapshots"));
     }
+
+    if (state.shieldTx && state.shieldTx.length > 2) {
+      tx.innerHTML = "";
+      var counts = state.shieldTx.map(function (d) { return d.count; });
+      var days = state.shieldTx.length;
+      tx.appendChild(el("h3", null, "Shielded transactions per day"));
+      tx.appendChild(sparkline(counts, 720, 120));
+      var sum = state.shieldTxTotal != null ? state.shieldTxTotal : counts.reduce(function (a, b) { return a + b; }, 0);
+      tx.appendChild(el("p", "muted", fmtNum(sum, 0) + " shielded txs over the last " + days + " days · source: CipherScan"));
+    }
+  }
+
+  function kpi(box, label, value, sub, delta) {
+    var t = el("div", "kpi");
+    t.appendChild(el("span", "kpi-k", label));
+    t.appendChild(el("span", "kpi-v", value));
+    var foot = el("span", "kpi-sub");
+    if (delta) foot.appendChild(el("span", "kpi-delta " + delta.cls, "30d " + delta.text + " · "));
+    foot.appendChild(document.createTextNode(sub));
+    t.appendChild(foot);
+    box.appendChild(t);
+  }
+
+  function deltaPct(zats, currentZec) {
+    if (zats == null || !isFinite(zats) || !currentZec) return null;
+    var d = zats / 1e8;
+    var base = currentZec - d;
+    if (base <= 0) return null;
+    var p = (d / base) * 100;
+    return { text: (p >= 0 ? "+" : "") + fmtNum(p, 2) + "%", cls: p >= 0 ? "up" : "down" };
+  }
+
+  function signedZec(zats) {
+    var v = zats / 1e8;
+    var sign = v > 0 ? "+" : v < 0 ? "-" : "";
+    return sign + fmtCompact(Math.abs(v));
   }
 
   function cap(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
@@ -530,6 +607,9 @@
     var cached = cacheGet("shielded", 300000);
     if (cached) {
       state.chain = cached.chain;
+      state.poolOverview = cached.overview || null;
+      state.shieldTx = cached.tx || null;
+      state.shieldTxTotal = cached.txTotal || null;
       state.shieldedSource = cached.source;
       state.shieldedAsOf = cached.asOf;
       state.shieldHistory = cached.history || null;
@@ -537,6 +617,8 @@
       renderShielded();
       return Promise.resolve();
     }
+
+    var since = new Date(Date.now() - 30 * 864e5).toISOString().slice(0, 10);
 
     var chainPromise = fetchJson("/api/cipherscan/blockchain-info", 12000).then(function (info) {
       var pools = (info.valuePools || []).map(function (p) {
@@ -551,6 +633,9 @@
         difficulty: info.difficulty
       };
     }).catch(function () { return null; });
+
+    var overviewPromise = fetchJson("/api/cipherscan/pools/overview", 12000).catch(function () { return null; });
+    var txPromise = fetchJson("/api/cipherscan/stats/shielded-daily?since=" + since, 12000).catch(function () { return null; });
 
     var historyPromise = Promise.all([
       fetchJson(ZECHU_BASE + "shielded_supply.json", 12000),
@@ -567,18 +652,30 @@
       };
     }).catch(function () { return null; });
 
-    return Promise.all([chainPromise, historyPromise]).then(function (res) {
+    return Promise.all([chainPromise, overviewPromise, txPromise, historyPromise]).then(function (res) {
       var chain = res[0];
-      var hist = res[1];
+      var overview = res[1];
+      var tx = res[2];
+      var hist = res[3];
       state.chain = chain;
+      state.poolOverview = overview;
+      state.shieldTx = tx && tx.daily && tx.daily.length ? tx.daily : null;
+      state.shieldTxTotal = tx ? tx.totalShielded : null;
       state.shieldHistory = hist ? hist.values : null;
       state.shieldTotal = hist ? hist.total : null;
       if (chain) state.shieldedSource = "CipherScan (live)";
       else if (hist) state.shieldedSource = "ZecHub";
-      state.shieldedAsOf = hist && hist.asOf ? hist.asOf : null;
+      if (chain && overview && overview.current && overview.current.updatedAt) {
+        state.shieldedAsOf = overview.current.updatedAt.replace("T", " ").slice(0, 16) + " UTC";
+      } else {
+        state.shieldedAsOf = hist && hist.asOf ? hist.asOf : null;
+      }
       if (chain || hist) {
         cacheSet("shielded", {
           chain: chain,
+          overview: overview,
+          tx: state.shieldTx,
+          txTotal: state.shieldTxTotal,
           source: state.shieldedSource,
           asOf: state.shieldedAsOf,
           history: state.shieldHistory,
